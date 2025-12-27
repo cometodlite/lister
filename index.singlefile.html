@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lister</title>
+  <meta name="description" content="Lister 소속 아티스트들의 노래를 듣는 웹사이트" />
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0IiBmaWxsPSJub25lIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iNjQiIHkyPSI2NCI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiM3QzRERkYiLz48c3RvcCBvZmZzZXQ9IjAuNSIgc3RvcC1jb2xvcj0iIzJERDRCRiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYwQTVGQSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iNiIgeT0iNiIgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIiByeD0iMTYiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wOCkiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjE4KSIvPgogIDxwYXRoIGQ9Ik0yNiAxOWg2djI2aC02VjE5Wm0xMCA2aDZ2MjBoLTZWMjVaIiBmaWxsPSJ1cmwoI2cpIi8+Cjwvc3ZnPgo=" type="image/svg+xml" />
+  <style>
+/* Lister v2 — GitHub Pages friendly (no build) */
+:root{
+  --bg: #0b0d12;
+  --bg2:#0a0c10;
+  --panel: rgba(255,255,255,0.06);
+  --panel2: rgba(255,255,255,0.04);
+  --stroke: rgba(255,255,255,0.12);
+  --stroke2: rgba(255,255,255,0.10);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.66);
+  --muted2: rgba(255,255,255,0.52);
+  --shadow: 0 16px 40px rgba(0,0,0,0.45);
+  --radius: 22px;
+  --radius2: 16px;
+
+  --accent1:#7C4DFF;
+  --accent2:#2DD4BF;
+  --accent3:#60A5FA;
+
+  --player-h: 100px;
+}
+
+/* Light theme */
+[data-theme="light"]{
+  --bg: #f7f8fb;
+  --bg2:#ffffff;
+  --panel: rgba(0,0,0,0.04);
+  --panel2: rgba(0,0,0,0.03);
+  --stroke: rgba(0,0,0,0.10);
+  --stroke2: rgba(0,0,0,0.08);
+  --text: rgba(0,0,0,0.88);
+  --muted: rgba(0,0,0,0.62);
+  --muted2: rgba(0,0,0,0.48);
+  --shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(900px 620px at 10% 0%, rgba(124,77,255,0.20) 0%, rgba(124,77,255,0) 60%),
+    radial-gradient(900px 620px at 92% 6%, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0) 60%),
+    radial-gradient(900px 620px at 70% 90%, rgba(96,165,250,0.14) 0%, rgba(96,165,250,0) 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  padding-bottom: calc(var(--player-h) + 18px);
+}
+
+a{ color: inherit; text-decoration: none; }
+code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .92em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--panel2);
+  border: 1px solid var(--stroke2);
+}
+
+.container{ max-width: 1100px; margin: 0 auto; padding: 22px 18px; }
+
+/* Topbar */
+.topbar{
+  position: sticky;
+  top:0;
+  z-index: 50;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  background: color-mix(in oklab, var(--bg) 72%, transparent);
+  border-bottom: 1px solid var(--stroke2);
+  backdrop-filter: blur(10px);
+}
+
+.brand-logo{ height: 42px; width: auto; display:block; }
+
+.nav{ display:flex; align-items:center; gap: 10px; flex-wrap: wrap; }
+.nav-link{
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+  color: var(--muted);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+}
+.nav-link:hover{
+  color: var(--text);
+  border-color: var(--stroke);
+  background: var(--panel);
+  transform: translateY(-1px);
+}
+
+.topbar-actions{ display:flex; align-items:center; gap: 10px; }
+
+.search{
+  position: relative;
+  display:flex; align-items:center;
+  width: min(360px, 46vw);
+}
+.search input{
+  width: 100%;
+  padding: 11px 44px 11px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+  color: var(--text);
+  outline: none;
+}
+.search input::placeholder{ color: var(--muted2); }
+.kbd{
+  position:absolute;
+  right: 10px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke2);
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.icon-btn{
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 9px 11px;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.icon-btn:hover{ border-color: var(--stroke); background: var(--panel); transform: translateY(-1px); }
+.icon-btn.big{ padding: 10px 15px; font-weight: 800; border-radius: 16px; }
+
+/* Hero */
+.hero{
+  display:grid;
+  grid-template-columns: 1.35fr .9fr;
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 10px;
+}
+.hero-left, .hero-right{
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.hero-left{ padding: 20px; }
+.hero-right{ padding: 14px; display:flex; align-items: center; justify-content: center; }
+
+.hero-title{
+  margin: 0;
+  font-size: clamp(26px, 3.2vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+.hero-desc{
+  margin: 12px 0 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.hero-cta{ margin-top: 14px; display:flex; gap: 10px; flex-wrap: wrap; }
+.btn{
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--accent3) 40%, var(--stroke2));
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent1) 18%, transparent),
+    color-mix(in oklab, var(--accent2) 16%, transparent),
+    color-mix(in oklab, var(--accent3) 14%, transparent)
+  );
+  color: var(--text);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.btn:hover{ transform: translateY(-1px); border-color: color-mix(in oklab, var(--accent3) 70%, var(--stroke2)); }
+.btn-ghost{
+  background: transparent;
+  border: 1px solid var(--stroke2);
+  color: var(--muted);
+}
+.btn-ghost:hover{ color: var(--text); border-color: var(--stroke); }
+
+.hero-stats{
+  margin-top: 16px;
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.stat{
+  padding: 12px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+}
+.stat-num{ font-weight: 900; font-size: 18px; }
+.stat-label{ margin-top: 3px; color: var(--muted2); font-size: 12px; }
+
+/* Featured */
+.featured-card{
+  width: 100%;
+  display:flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+}
+.featured-cover-wrap{
+  width: 120px;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--stroke2);
+  background: rgba(0,0,0,0.08);
+  flex: 0 0 auto;
+}
+.featured-cover{ width:100%; height:100%; object-fit: cover; display:block; }
+.featured-meta{ display:flex; flex-direction: column; justify-content: space-between; gap: 10px; flex:1; }
+.pill{
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke2);
+  background: color-mix(in oklab, var(--accent2) 14%, transparent);
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+.featured-title{ font-weight: 900; font-size: 18px; }
+.featured-artist{ color: var(--muted); margin-top: -6px; }
+.featured-actions{ display:flex; gap: 8px; }
+
+/* Sections */
+.section{ margin-top: 22px; }
+.section-head h2{ margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.section-head p{ margin: 6px 0 0 0; color: var(--muted); }
+
+.grid{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card{
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-head{ display:flex; gap: 12px; align-items: center; }
+.avatar{
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  border: 1px solid var(--stroke2);
+  overflow: hidden;
+  background: rgba(0,0,0,0.08);
+  flex: 0 0 auto;
+}
+.avatar img{ width:100%; height:100%; object-fit: cover; display:block; }
+
+.card-title{ font-weight: 900; }
+.card-sub{ color: var(--muted2); font-size: 12px; margin-top: 2px; }
+.card-bio{ color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 2px; }
+
+.tracklist{ display:flex; flex-direction: column; gap: 8px; }
+.track{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--stroke2);
+  background: var(--panel2);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.track:hover{ transform: translateY(-1px); border-color: var(--stroke); background: var(--panel); }
+.track-left{ display:flex; align-items:center; gap: 10px; min-width: 0; }
+.track-cover{
+  width: 34px; height: 34px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke2);
+  overflow: hidden;
+  background: rgba(0,0,0,0.08);
+  flex: 0 0 auto;
+}
+.track-cover img{ width:100%; height:100%; object-fit: cover; display:block; }
+.track-name{ font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track-meta{ color: var(--muted2); font-size: 12px; flex: 0 0 auto; }
+
+/* Library */
+.library{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.panel{
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  min-height: 220px;
+}
+.panel-title{
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.results, .queue{
+  display:flex; flex-direction: column; gap: 8px;
+}
+.empty{
+  color: var(--muted);
+  border: 1px dashed var(--stroke2);
+  background: var(--panel2);
+  padding: 12px;
+  border-radius: 16px;
+}
+
+.note{
+  margin-top: 14px;
+  border-radius: var(--radius);
+  border: 1px dashed var(--stroke2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.note ol{ margin: 0; padding-left: 18px; }
+.tip{ margin-top: 8px; font-size: 12px; color: var(--muted2); }
+
+/* Player */
+.player{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--player-h);
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--stroke2);
+  background: color-mix(in oklab, var(--bg) 70%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.player-left{ display:flex; align-items:center; gap: 10px; min-width: 240px; }
+.now-cover{
+  width: 54px; height: 54px;
+  border-radius: 18px;
+  border: 1px solid var(--stroke2);
+  overflow:hidden;
+  background: rgba(0,0,0,0.08);
+}
+.now-cover{ object-fit: cover; }
+.now-title{ font-weight: 900; }
+.now-artist{ color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+.player-center{ flex: 1; display:flex; flex-direction: column; gap: 10px; align-items:center; }
+.controls{ display:flex; gap: 10px; align-items:center; justify-content:center; }
+.seek{ width: min(620px, 100%); display:flex; gap: 10px; align-items:center; }
+.time{ color: var(--muted2); font-size: 12px; min-width: 40px; text-align:center; }
+#seekbar{ width: 100%; }
+
+.player-right{ display:flex; align-items:center; gap: 10px; min-width: 170px; justify-content: flex-end; }
+#vol{ width: 110px; }
+
+/* Responsive */
+@media (max-width: 900px){
+  .hero{ grid-template-columns: 1fr; }
+  .library{ grid-template-columns: 1fr; }
+}
+@media (max-width: 680px){
+  :root{ --player-h: 140px; }
+  .topbar{ flex-wrap: wrap; align-items: stretch; }
+  .search{ width: 100%; }
+  .player{ height: var(--player-h); flex-wrap: wrap; }
+  .player-left{ min-width: 100%; }
+  .player-right{ min-width: 100%; justify-content: space-between; }
+  .seek{ width: 100%; }
+}
+
+</style>
+</head>
+<body>
+  <script>window.__LISTER_DATA__ = {
+  "brand": {
+    "name": "LISTER",
+    "tagline": "Listen to Lister artists — clean, fast, fan-first."
+  },
+  "featured": {
+    "artist": "AURORA",
+    "title": "Starfall",
+    "src": "music/sample-1.mp3",
+    "duration": "03:12",
+    "cover": "assets/cover-aurora.svg"
+  },
+  "artists": [
+    {
+      "id": "aurora",
+      "name": "AURORA",
+      "genre": "Dream Pop · Ambient",
+      "bio": "달빛 같은 신스와 잔잔한 보컬로 만드는 몽환적 사운드.",
+      "avatar": "assets/avatar-aurora.svg",
+      "tracks": [
+        {
+          "title": "Starfall",
+          "src": "music/sample-1.mp3",
+          "duration": "03:12",
+          "cover": "assets/cover-aurora.svg"
+        },
+        {
+          "title": "Midnight Echo",
+          "src": "music/sample-2.mp3",
+          "duration": "02:48",
+          "cover": "assets/cover-aurora.svg"
+        }
+      ]
+    },
+    {
+      "id": "neonx",
+      "name": "NEON-X",
+      "genre": "Electro · Synthwave",
+      "bio": "도시의 네온을 닮은 강한 킥과 반짝이는 리드.",
+      "avatar": "assets/avatar-neonx.svg",
+      "tracks": [
+        {
+          "title": "Lunar Signal",
+          "src": "music/sample-3.mp3",
+          "duration": "03:35",
+          "cover": "assets/cover-neonx.svg"
+        },
+        {
+          "title": "Pulse Drive",
+          "src": "music/sample-4.mp3",
+          "duration": "02:59",
+          "cover": "assets/cover-neonx.svg"
+        }
+      ]
+    },
+    {
+      "id": "serena",
+      "name": "SERENA",
+      "genre": "Ballad · Pop",
+      "bio": "담백한 멜로디와 감정선 중심의 보컬.",
+      "avatar": "assets/avatar-serena.svg",
+      "tracks": [
+        {
+          "title": "First Light",
+          "src": "music/sample-5.mp3",
+          "duration": "03:08",
+          "cover": "assets/cover-serena.svg"
+        }
+      ]
+    }
+  ]
+};</script>
+
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Lister home">
+      <img class="brand-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNjAiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCAzNjAgOTYiIGZpbGw9Im5vbmUiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIzNjAiIHkyPSI5NiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjN0M0REZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41IiBzdG9wLWNvbG9yPSIjMkRENEJGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYwQTVGQSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9InMiIHg9Ii0yMCUiIHk9Ii00MCUiIHdpZHRoPSIxNDAlIiBoZWlnaHQ9IjE4MCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI2IiByZXN1bHQ9ImIiLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49ImIiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIxIDAgMCAwIDAgIDAgMSAwIDAgMCAgMCAwIDEgMCAwICAwIDAgMCAuMjggMCIvPgogICAgICA8ZmVCbGVuZCBpbj0iU291cmNlR3JhcGhpYyIgbW9kZT0ibm9ybWFsIi8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPHJlY3QgeD0iOCIgeT0iMTAiIHdpZHRoPSIzNDQiIGhlaWdodD0iNzYiIHJ4PSIyMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA2KSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMTIpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI3MpIj4KICAgIDx0ZXh0IHg9IjMyIiB5PSI2MiIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjgwMCIgbGV0dGVyLXNwYWNpbmc9IjYiIGZpbGw9InVybCgjZykiPkxJU1RFUjwvdGV4dD4KICA8L2c+CiAgPGNpcmNsZSBjeD0iMzEyIiBjeT0iNDgiIHI9IjEwIiBmaWxsPSJ1cmwoI2cpIi8+Cjwvc3ZnPgo=" alt="Lister" />
+    </a>
+
+    <nav class="nav" aria-label="main">
+      <a class="nav-link" href="#artists">Artists</a>
+      <a class="nav-link" href="#library">Library</a>
+      <a class="nav-link" href="#about">About</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <div class="search">
+        <input id="q" type="search" placeholder="곡 / 아티스트 검색" autocomplete="off" />
+        <kbd class="kbd">/</kbd>
+      </div>
+      <button id="btnTheme" class="icon-btn" title="테마 전환">🌓</button>
+    </div>
+  </header>
+
+  <main class="container" id="home">
+    <section class="hero">
+      <div class="hero-left">
+        <h1 class="hero-title">Lister에서 듣는<br/>소속 아티스트 사운드</h1>
+        <p class="hero-desc">
+          GitHub Pages에 그대로 올려서 운영할 수 있는 <b>정적 사이트</b> 템플릿.
+          곡 파일은 <code>music/</code>에 넣고, 데이터는 <code>artists.json</code>만 수정하면 끝.
+        </p>
+
+        <div class="hero-cta">
+          <button class="btn" id="btnFeatured">▶ 추천곡 재생</button>
+          <button class="btn btn-ghost" id="btnShuffle">🔀 셔플</button>
+        </div>
+
+        <div class="hero-stats" aria-label="stats">
+          <div class="stat"><div class="stat-num" id="statArtists">—</div><div class="stat-label">Artists</div></div>
+          <div class="stat"><div class="stat-num" id="statTracks">—</div><div class="stat-label">Tracks</div></div>
+          <div class="stat"><div class="stat-num">Static</div><div class="stat-label">Fast Deploy</div></div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="featured-card" id="featuredCard" aria-label="featured track">
+          <div class="featured-cover-wrap">
+            <img id="featuredCover" class="featured-cover" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgNjAwIDYwMCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImMiIHgxPSI0MCIgeTE9IjQwIiB4Mj0iNTYwIiB5Mj0iNTYwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiM3QzRERkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjMkRENEJGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYwQTVGQSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iciIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxNDAgMTIwKSByb3RhdGUoNDUpIHNjYWxlKDUyMCkiPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjIpIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0icmdiYSgyNTUsMjU1LDI1NSwwKSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMzYiIHk9IjM2IiB3aWR0aD0iNTI4IiBoZWlnaHQ9IjUyOCIgcng9IjcyIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDYpIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4xMikiLz4KICA8cmVjdCB4PSI3MiIgeT0iNzIiIHdpZHRoPSI0NTYiIGhlaWdodD0iNDU2IiByeD0iNjQiIGZpbGw9InVybCgjYykiIG9wYWNpdHk9IjAuMTgiLz4KICA8Y2lyY2xlIGN4PSI0MjAiIGN5PSIyMTAiIHI9IjEyMCIgZmlsbD0idXJsKCNjKSIgb3BhY2l0eT0iMC4xOCIvPgogIDxyZWN0IHg9IjcyIiB5PSI3MiIgd2lkdGg9IjQ1NiIgaGVpZ2h0PSI0NTYiIHJ4PSI2NCIgZmlsbD0idXJsKCNyKSIvPgogIDx0ZXh0IHg9Ijk2IiB5PSI0NjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtd2VpZ2h0PSI4NTAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45NSkiPlN0YXJmYWxsPC90ZXh0PgogIDx0ZXh0IHg9Ijk2IiB5PSI1MTAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC44KSI+TGlzdGVyIFNpbmdsZTwvdGV4dD4KPC9zdmc+Cg==" alt="featured cover" />
+          </div>
+          <div class="featured-meta">
+            <div class="pill">FEATURED</div>
+            <div id="featuredTitle" class="featured-title">—</div>
+            <div id="featuredArtist" class="featured-artist">—</div>
+            <div class="featured-actions">
+              <button class="icon-btn" id="btnFeaturedPlay" title="재생/일시정지">▶</button>
+              <button class="icon-btn" id="btnQueueOpen" title="큐 열기">≡</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="artists">
+      <div class="section-head">
+        <h2>Artists</h2>
+        <p>아티스트별 곡 목록. 클릭하면 바로 재생 + 큐에 반영.</p>
+      </div>
+      <div id="artistGrid" class="grid" aria-live="polite"></div>
+    </section>
+
+    <section class="section" id="library">
+      <div class="section-head">
+        <h2>Library</h2>
+        <p>검색 결과 / 큐 / 좋아요(추후) 영역</p>
+      </div>
+
+      <div class="library">
+        <div class="panel">
+          <div class="panel-title">Search Results</div>
+          <div id="results" class="results empty">검색어를 입력해봐.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Up Next</div>
+          <div id="queue" class="queue empty">큐가 비어있어.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="section-head">
+        <h2>About</h2>
+        <p>간단 운영 가이드</p>
+      </div>
+      <div class="note">
+        <ol>
+          <li><b>MP3</b>를 <code>music/</code>에 넣기</li>
+          <li><code>artists.json</code>에서 아티스트/곡/커버 경로 수정</li>
+          <li>GitHub Pages에서 배포 (README 참고)</li>
+        </ol>
+        <div class="tip">팁: 커버 이미지는 png/jpg도 가능. 지금은 SVG 샘플이 들어있음.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Player -->
+  <footer class="player" id="player" aria-label="player">
+    <div class="player-left">
+      <img id="nowCover" class="now-cover" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgNjAwIDYwMCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImMiIHgxPSI0MCIgeTE9IjQwIiB4Mj0iNTYwIiB5Mj0iNTYwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiM3QzRERkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjMkRENEJGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYwQTVGQSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iciIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxNDAgMTIwKSByb3RhdGUoNDUpIHNjYWxlKDUyMCkiPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjIpIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0icmdiYSgyNTUsMjU1LDI1NSwwKSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMzYiIHk9IjM2IiB3aWR0aD0iNTI4IiBoZWlnaHQ9IjUyOCIgcng9IjcyIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDYpIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4xMikiLz4KICA8cmVjdCB4PSI3MiIgeT0iNzIiIHdpZHRoPSI0NTYiIGhlaWdodD0iNDU2IiByeD0iNjQiIGZpbGw9InVybCgjYykiIG9wYWNpdHk9IjAuMTgiLz4KICA8Y2lyY2xlIGN4PSI0MjAiIGN5PSIyMTAiIHI9IjEyMCIgZmlsbD0idXJsKCNjKSIgb3BhY2l0eT0iMC4xOCIvPgogIDxyZWN0IHg9IjcyIiB5PSI3MiIgd2lkdGg9IjQ1NiIgaGVpZ2h0PSI0NTYiIHJ4PSI2NCIgZmlsbD0idXJsKCNyKSIvPgogIDx0ZXh0IHg9Ijk2IiB5PSI0NjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtd2VpZ2h0PSI4NTAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45NSkiPlN0YXJmYWxsPC90ZXh0PgogIDx0ZXh0IHg9Ijk2IiB5PSI1MTAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIFNlZ29lIFVJLCBSb2JvdG8sIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC44KSI+TGlzdGVyIFNpbmdsZTwvdGV4dD4KPC9zdmc+Cg==" alt="cover" />
+      <div class="now-meta">
+        <div id="nowTitle" class="now-title">재생 중인 곡 없음</div>
+        <div id="nowArtist" class="now-artist">—</div>
+      </div>
+    </div>
+
+    <div class="player-center">
+      <div class="controls">
+        <button class="icon-btn" id="btnPrev" title="이전">⏮</button>
+        <button class="icon-btn big" id="btnToggle" title="재생/일시정지">▶</button>
+        <button class="icon-btn" id="btnNext" title="다음">⏭</button>
+      </div>
+
+      <div class="seek">
+        <span class="time" id="curTime">0:00</span>
+        <input id="seekbar" type="range" min="0" max="1000" value="0" />
+        <span class="time" id="durTime">0:00</span>
+      </div>
+    </div>
+
+    <div class="player-right">
+      <button class="icon-btn" id="btnMute" title="음소거">🔊</button>
+      <input id="vol" type="range" min="0" max="1" step="0.01" value="0.9" title="볼륨" />
+    </div>
+
+    <audio id="audio" preload="metadata"></audio>
+  </footer>
+
+  <script>
+// Lister v2 (static) — render from artists.json + audio player
+(() => {
+  const $ = (s, p=document) => p.querySelector(s);
+  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+
+  const audio = $('#audio');
+  const nowTitle = $('#nowTitle');
+  const nowArtist = $('#nowArtist');
+  const nowCover = $('#nowCover');
+
+  const featuredTitle = $('#featuredTitle');
+  const featuredArtist = $('#featuredArtist');
+  const featuredCover = $('#featuredCover');
+  const btnFeatured = $('#btnFeatured');
+  const btnFeaturedPlay = $('#btnFeaturedPlay');
+
+  const btnToggle = $('#btnToggle');
+  const btnPrev = $('#btnPrev');
+  const btnNext = $('#btnNext');
+  const btnMute = $('#btnMute');
+  const vol = $('#vol');
+  const seekbar = $('#seekbar');
+  const curTime = $('#curTime');
+  const durTime = $('#durTime');
+
+  const q = $('#q');
+  const results = $('#results');
+  const queueEl = $('#queue');
+
+  const statArtists = $('#statArtists');
+  const statTracks = $('#statTracks');
+
+  const btnTheme = $('#btnTheme');
+  const btnShuffle = $('#btnShuffle');
+  const btnQueueOpen = $('#btnQueueOpen');
+
+  let library = null; // loaded json
+  let flatTracks = [];
+  let queue = [];
+  let idx = -1; // index in queue
+  let userSeeking = false;
+
+  const STORAGE_THEME = 'lister_theme_v2';
+
+  function fmt(t){
+    if (!isFinite(t) || t < 0) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(STORAGE_THEME, next);
+  }
+
+  function toggleTheme(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  }
+
+  function applySavedTheme(){
+    const saved = localStorage.getItem(STORAGE_THEME);
+    if (saved === 'light' || saved === 'dark') setTheme(saved);
+    else document.documentElement.setAttribute('data-theme','dark');
+  }
+
+  function normalize(s){ return (s || '').toLowerCase().trim(); }
+
+  function pushQueue(track, playNow=false){
+    queue.push(track);
+    renderQueue();
+    if (playNow){
+      idx = queue.length - 1;
+      loadAndPlayCurrent();
+    } else if (idx === -1){
+      idx = 0;
+      loadAndPlayCurrent(false);
+    }
+  }
+
+  function setNow(track){
+    nowTitle.textContent = track?.title || '재생 중인 곡 없음';
+    nowArtist.textContent = track?.artist || '—';
+    nowCover.src = track?.cover || 'assets/cover-aurora.svg';
+  }
+
+  function loadAndPlayCurrent(autoPlay=true){
+    const track = queue[idx];
+    if (!track) return;
+    setNow(track);
+    audio.src = track.src;
+    if (autoPlay){
+      audio.play().catch(()=>{ btnToggle.textContent = '▶'; });
+    }
+    highlightPlaying(track);
+  }
+
+  function highlightPlaying(track){
+    $$('.track').forEach(btn => {
+      const match = btn.dataset.src === track.src && btn.dataset.title === track.title && btn.dataset.artist === track.artist;
+      btn.setAttribute('data-playing', match ? '1' : '0');
+      if (match) btn.style.borderColor = 'color-mix(in oklab, var(--accent3) 72%, var(--stroke2))';
+      else btn.style.borderColor = 'var(--stroke2)';
+    });
+  }
+
+  function next(){
+    if (!queue.length) return;
+    idx = (idx + 1) % queue.length;
+    loadAndPlayCurrent(true);
+  }
+
+  function prev(){
+    if (!queue.length) return;
+    idx = (idx - 1 + queue.length) % queue.length;
+    loadAndPlayCurrent(true);
+  }
+
+  function toggle(){
+    if (!audio.src){
+      if (queue.length) { idx = Math.max(0, idx); loadAndPlayCurrent(true); }
+      else if (flatTracks.length) { queue = [flatTracks[0]]; idx = 0; renderQueue(); loadAndPlayCurrent(true); }
+      return;
+    }
+    if (audio.paused) audio.play().catch(()=>{});
+    else audio.pause();
+  }
+
+  function renderQueue(){
+    if (!queue.length){
+      queueEl.classList.add('empty');
+      queueEl.textContent = '큐가 비어있어.';
+      return;
+    }
+    queueEl.classList.remove('empty');
+    queueEl.innerHTML = '';
+    queue.forEach((t, i) => {
+      const row = document.createElement('button');
+      row.className = 'track';
+      row.style.justifyContent = 'space-between';
+      row.innerHTML = `
+        <span class="track-left">
+          <span class="track-cover"><img alt="cover" src="${t.cover || 'assets/cover-aurora.svg'}"></span>
+          <span class="track-name">${escapeHtml(t.title)}</span>
+        </span>
+        <span class="track-meta">${escapeHtml(t.artist)} · ${escapeHtml(t.duration || '')}</span>
+      `;
+      row.addEventListener('click', () => {
+        idx = i;
+        loadAndPlayCurrent(true);
+      });
+      if (i === idx) row.style.borderColor = 'color-mix(in oklab, var(--accent2) 70%, var(--stroke2))';
+      queueEl.appendChild(row);
+    });
+  }
+
+  function escapeHtml(s){
+    return (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  }
+
+  function renderArtists(){
+    const grid = $('#artistGrid');
+    grid.innerHTML = '';
+    const artists = library?.artists || [];
+    artists.forEach(a => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      const tracksHtml = (a.tracks || []).map(t => {
+        const trackObj = {
+          title: t.title,
+          artist: a.name,
+          src: t.src,
+          duration: t.duration || '',
+          cover: t.cover || ''
+        };
+        const payload = encodeURIComponent(JSON.stringify(trackObj));
+        return `
+          <button class="track" data-payload="${payload}" data-src="${escapeHtml(trackObj.src)}" data-title="${escapeHtml(trackObj.title)}" data-artist="${escapeHtml(trackObj.artist)}">
+            <span class="track-left">
+              <span class="track-cover"><img alt="cover" src="${escapeHtml(trackObj.cover || 'assets/cover-aurora.svg')}"></span>
+              <span class="track-name">${escapeHtml(trackObj.title)}</span>
+            </span>
+            <span class="track-meta">${escapeHtml(trackObj.duration)}</span>
+          </button>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="card-head">
+          <div class="avatar"><img alt="${escapeHtml(a.name)}" src="${escapeHtml(a.avatar || 'assets/avatar-aurora.svg')}"></div>
+          <div>
+            <div class="card-title">${escapeHtml(a.name)}</div>
+            <div class="card-sub">${escapeHtml(a.genre || '')}</div>
+            <div class="card-bio">${escapeHtml(a.bio || '')}</div>
+          </div>
+        </div>
+        <div class="tracklist">${tracksHtml}</div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    // bind play events
+    $$('.track').forEach(btn => {
+      const payload = btn.dataset.payload;
+      if (!payload) return;
+      btn.addEventListener('click', () => {
+        const track = JSON.parse(decodeURIComponent(payload));
+        // if same track already in queue, jump to it (optional)
+        const found = queue.findIndex(qt => qt.src === track.src && qt.title === track.title && qt.artist === track.artist);
+        if (found >= 0){
+          idx = found;
+          loadAndPlayCurrent(true);
+          renderQueue();
+        } else {
+          pushQueue(track, true);
+        }
+      });
+    });
+  }
+
+  function buildFlatTracks(){
+    flatTracks = [];
+    const artists = library?.artists || [];
+    artists.forEach(a => (a.tracks || []).forEach(t => {
+      flatTracks.push({
+        title: t.title,
+        artist: a.name,
+        src: t.src,
+        duration: t.duration || '',
+        cover: t.cover || ''
+      });
+    }));
+  }
+
+  function setFeatured(){
+    const f = library?.featured;
+    if (!f) return;
+    featuredTitle.textContent = f.title || '—';
+    featuredArtist.textContent = f.artist || '—';
+    featuredCover.src = f.cover || 'assets/cover-aurora.svg';
+
+    btnFeatured?.addEventListener('click', () => {
+      pushQueue({ title: f.title, artist: f.artist, src: f.src, duration: f.duration || '', cover: f.cover || '' }, true);
+    });
+    btnFeaturedPlay?.addEventListener('click', toggle);
+  }
+
+  function setStats(){
+    const artists = library?.artists || [];
+    statArtists.textContent = String(artists.length);
+    statTracks.textContent = String(flatTracks.length);
+  }
+
+  function shufflePlay(){
+    if (!flatTracks.length) return;
+    const pick = flatTracks[Math.floor(Math.random() * flatTracks.length)];
+    pushQueue(pick, true);
+  }
+
+  function runSearch(term){
+    const t = normalize(term);
+    if (!t){
+      results.classList.add('empty');
+      results.textContent = '검색어를 입력해봐.';
+      return;
+    }
+    const hits = flatTracks.filter(x => normalize(x.title).includes(t) || normalize(x.artist).includes(t));
+    results.innerHTML = '';
+    results.classList.remove('empty');
+
+    if (!hits.length){
+      results.classList.add('empty');
+      results.textContent = '검색 결과가 없어.';
+      return;
+    }
+
+    hits.slice(0, 30).forEach(track => {
+      const row = document.createElement('button');
+      row.className = 'track';
+      row.innerHTML = `
+        <span class="track-left">
+          <span class="track-cover"><img alt="cover" src="${track.cover || 'assets/cover-aurora.svg'}"></span>
+          <span class="track-name">${escapeHtml(track.title)}</span>
+        </span>
+        <span class="track-meta">${escapeHtml(track.artist)} · ${escapeHtml(track.duration || '')}</span>
+      `;
+      row.addEventListener('click', () => pushQueue(track, true));
+      results.appendChild(row);
+    });
+  }
+
+  function bindPlayer(){
+    btnToggle?.addEventListener('click', toggle);
+    btnPrev?.addEventListener('click', prev);
+    btnNext?.addEventListener('click', next);
+
+    btnMute?.addEventListener('click', () => {
+      audio.muted = !audio.muted;
+      btnMute.textContent = audio.muted ? '🔇' : '🔊';
+    });
+
+    if (vol){
+      audio.volume = Number(vol.value || 0.9);
+      vol.addEventListener('input', () => {
+        audio.volume = Number(vol.value);
+        if (audio.muted && audio.volume > 0){
+          audio.muted = false;
+          btnMute.textContent = '🔊';
+        }
+      });
+    }
+
+    if (seekbar){
+      seekbar.addEventListener('input', () => { userSeeking = true; });
+      seekbar.addEventListener('change', () => {
+        if (!audio.duration) return;
+        const v = Number(seekbar.value) / Number(seekbar.max);
+        audio.currentTime = v * audio.duration;
+        userSeeking = false;
+      });
+    }
+
+    audio.addEventListener('timeupdate', () => {
+      curTime.textContent = fmt(audio.currentTime);
+      if (!audio.duration) return;
+      durTime.textContent = fmt(audio.duration);
+      if (!userSeeking){
+        const v = (audio.currentTime / audio.duration) * Number(seekbar.max || 1000);
+        seekbar.value = String(Math.floor(v));
+      }
+    });
+
+    audio.addEventListener('play', () => { btnToggle.textContent = '⏸'; });
+    audio.addEventListener('pause', () => { btnToggle.textContent = '▶'; });
+    audio.addEventListener('ended', next);
+  }
+
+  function bindUX(){
+    // search
+    q?.addEventListener('input', () => runSearch(q.value));
+
+    // '/' focus
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== q){
+        e.preventDefault();
+        q?.focus();
+      }
+      // ESC to blur
+      if (e.key === 'Escape' && document.activeElement === q) q?.blur();
+    });
+
+    // theme
+    btnTheme?.addEventListener('click', toggleTheme);
+
+    // shuffle
+    btnShuffle?.addEventListener('click', shufflePlay);
+
+    // queue jump
+    btnQueueOpen?.addEventListener('click', () => {
+      document.getElementById('library')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  async function init(){
+    applySavedTheme();
+    bindPlayer();
+    bindUX();
+
+    if (window.__LISTER_DATA__) {
+      library = window.__LISTER_DATA__;
+    } else {
+      const res = await fetch('artists.json', { cache: 'no-store' });
+      library = await res.json();
+    }
+
+    buildFlatTracks();
+    renderArtists();
+    setFeatured();
+    setStats();
+
+    // prefill queue with featured (not autoplay)
+    if (library?.featured){
+      queue = [{ title: library.featured.title, artist: library.featured.artist, src: library.featured.src, duration: library.featured.duration || '', cover: library.featured.cover || '' }];
+      idx = 0;
+      renderQueue();
+      setNow(queue[0]);
+    }
+  }
+
+  init().catch((err) => {
+    console.error(err);
+    results.classList.add('empty');
+    results.textContent = 'artists.json을 불러오지 못했어. GitHub Pages 경로/파일명을 확인해줘.';
+  });
+})();
+</script>
+</body>
+</html>
