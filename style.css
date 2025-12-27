@@ -572,3 +572,42 @@ button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
   .hero-stats{ grid-template-columns: 1fr !important; }
   .player .meta{ display:none !important; }
 }
+
+
+
+/* ------------------------------
+   Icons (Apple-music-ish, no emoji)
+   ------------------------------ */
+.icon{
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  background: currentColor;
+  -webkit-mask: var(--icon) center/contain no-repeat;
+  mask: var(--icon) center/contain no-repeat;
+}
+.icon-btn.big .icon{
+  width: 20px;
+  height: 20px;
+}
+.i-prev{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%205h2v14H6zM18%206.5v11L9%2012z%22/%3E%3C/svg%3E"); }
+.i-next{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M16%205h2v14h-2zM6%206.5v11L15%2012z%22/%3E%3C/svg%3E"); }
+.i-play{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M8%205v14l11-7z%22/%3E%3C/svg%3E"); }
+.i-pause{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%205h4v14H7zM13%205h4v14h-4z%22/%3E%3C/svg%3E"); }
+.i-volume{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16.5%2012a3.5%203.5%200%200%200-2-3.16v6.32a3.5%203.5%200%200%200%202-3.16z%22/%3E%3Cpath%20d%3D%22M14.5%205.5v2.2a6.5%206.5%200%200%201%200%208.6v2.2a8.7%208.7%200%200%200%200-13.2z%22/%3E%3C/svg%3E"); }
+.i-mute{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16%209l5%205m0-5-5%205%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E"); }
+.i-theme{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%203a9%209%200%201%200%200%2018V3z%22/%3E%3Cpath%20d%3D%22M12%203a9%209%200%200%201%200%2018%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22/%3E%3C/svg%3E"); }
+
+/* When playing, show pause icon */
+#btnToggle.is-playing .i-play{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%205h4v14H7zM13%205h4v14h-4z%22/%3E%3C/svg%3E"); }
+
+/* When muted, show mute icon */
+#btnMute.is-muted .i-volume{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16%209l5%205m0-5-5%205%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E"); }
+
+/* Icon buttons visual polish */
+.icon-btn{
+  font-size: 0; /* hide any accidental text spacing */
+}
+.icon-btn .icon{
+  opacity: .95;
+}

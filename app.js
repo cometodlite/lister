@@ -91,7 +91,7 @@
     setNow(track);
     audio.src = track.src;
     if (autoPlay){
-      audio.play().catch(()=>{ btnToggle.textContent = '▶'; });
+      audio.play().catch(()=>{ btnToggle.classList.remove("is-playing"); });
     }
     highlightPlaying(track);
   }
@@ -307,7 +307,7 @@
         audio.volume = Number(vol.value);
         if (audio.muted && audio.volume > 0){
           audio.muted = false;
-          btnMute.textContent = '🔊';
+          btnMute.classList.remove("is-muted");
         }
       });
     }
@@ -332,8 +332,8 @@
       }
     });
 
-    audio.addEventListener('play', () => { btnToggle.textContent = '⏸'; });
-    audio.addEventListener('pause', () => { btnToggle.textContent = '▶'; });
+    audio.addEventListener('play', () => { btnToggle.classList.add('is-playing'); });
+    audio.addEventListener('pause', () => { btnToggle.classList.remove('is-playing'); });
     audio.addEventListener('ended', next);
   }
 
