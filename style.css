@@ -394,3 +394,181 @@ code{
   .player-right{ min-width: 100%; justify-content: space-between; }
   .seek{ width: 100%; }
 }
+
+
+
+/* ------------------------------
+   Mobile responsive add-on (v1)
+   ------------------------------ */
+:root{
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* Improve tap targets */
+button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Make header wrap nicely on small screens */
+@media (max-width: 900px){
+  header.topbar{
+    padding: 10px 12px;
+  }
+  .topbar .right{
+    gap: 8px;
+  }
+  .topbar .nav{
+    gap: 8px;
+  }
+  .topbar .nav a{
+    padding: 10px 12px;
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 720px){
+  /* Overall gutters */
+  .container{
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Topbar becomes 2-row */
+  header.topbar{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding-top: calc(10px + var(--safe-top));
+    backdrop-filter: blur(14px);
+  }
+  .topbar{
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .topbar .brand{
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+  .topbar .nav{
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topbar .nav::-webkit-scrollbar{ display:none; }
+
+  .topbar .search{
+    order: 2;
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .search input{
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  /* Hero grid -> single column */
+  .hero-grid{
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .hero-card{
+    padding: 18px !important;
+  }
+  .hero-title{
+    font-size: 34px !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.02em;
+  }
+
+  /* Stats cards stack */
+  .hero-stats{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .stat-card{
+    padding: 12px !important;
+  }
+
+  /* Featured card */
+  .featured-card{
+    padding: 16px !important;
+  }
+  .featured-row{
+    grid-template-columns: 72px 1fr !important;
+    gap: 12px !important;
+  }
+  .cover{
+    width: 72px !important;
+    height: 72px !important;
+  }
+
+  /* Artists list */
+  .artist-card{
+    padding: 14px !important;
+  }
+  .artist-head{
+    gap: 10px !important;
+  }
+  .artist-meta .name{
+    font-size: 16px !important;
+  }
+
+  /* Tracks: increase spacing */
+  .track{
+    padding: 12px 12px !important;
+    border-radius: 14px !important;
+  }
+  .track .title{
+    font-size: 15px !important;
+  }
+  .track .right{
+    gap: 8px !important;
+  }
+
+  /* Library columns -> stack */
+  .library-grid{
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Bottom player: larger, safe-area padding */
+  .player{
+    padding-bottom: calc(10px + var(--safe-bottom)) !important;
+  }
+  .player .row{
+    gap: 10px !important;
+  }
+  .player .now{
+    min-width: 0 !important;
+  }
+  .player .now .title{
+    font-size: 14px !important;
+  }
+  .player .controls button{
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 14px !important;
+  }
+  .player .seek{
+    min-width: 0 !important;
+  }
+  .player input[type="range"]{
+    height: 6px !important;
+  }
+
+  /* Reduce heavy shadows on mobile for performance */
+  .glass{
+    box-shadow: 0 18px 50px rgba(0,0,0,.20) !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 420px){
+  .hero-title{ font-size: 30px !important; }
+  .hero-stats{ grid-template-columns: 1fr !important; }
+  .player .meta{ display:none !important; }
+}

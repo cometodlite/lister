@@ -391,3 +391,6 @@
     results.textContent = 'artists.json을 불러오지 못했어. GitHub Pages 경로/파일명을 확인해줘.';
   });
 })();
+
+// mobile-tap
+window.addEventListener('touchstart', () => {}, { passive: true });
