@@ -494,3 +494,18 @@ window.addEventListener('touchstart', () => {}, { passive: true });
     initMiniPlayer();
   }
 })();
+
+
+// --- v5: sync body padding to mini player height (Apple Music-style dock) ---
+function setMiniPlayerHeight(){
+  const player = document.getElementById('player') || document.querySelector('.player') || document.querySelector('.mini-player');
+  if(!player) return;
+  // measure visible height excluding safe area padding if possible
+  const rect = player.getBoundingClientRect();
+  // clamp to reasonable range
+  const h = Math.max(88, Math.min(160, Math.round(rect.height)));
+  document.documentElement.style.setProperty('--mini-player-h', (h) + 'px');
+}
+window.addEventListener('load', setMiniPlayerHeight);
+window.addEventListener('resize', setMiniPlayerHeight);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) setMiniPlayerHeight(); });

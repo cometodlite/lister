@@ -622,22 +622,21 @@ button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
 :root{
   --player-mini-h: 118px;
   --player-expanded-h: 186px;
-  --player-lift: 0px; /* lifted above browser UI */
+   /* lifted above browser UI */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Platform classes (set by JS) */
-html.is-ios{ --player-lift: calc(var(--safe-bottom) + 24px); }
-html.is-android{ --player-lift: 84px; } /* Android nav bar clearance */
+/* Android nav bar clearance */
 
 /* player positioning */
 .player{
-  bottom: var(--player-lift) !important;
+  bottom: var(
 }
 
 /* Ensure page content is never hidden behind player */
 body{
-  padding-bottom: calc(var(--player-current-h, var(--player-mini-h)) + var(--player-lift) + 18px) !important;
+  padding-bottom: calc(var(--player-current-h, var(--player-mini-h)) + var(
 }
 
 /* Mobile default: mini */
@@ -762,4 +761,55 @@ body{
 /* Mini player: hide explicit expand button on mobile (tap bar to expand) */
 @media (max-width: 720px){
   #btnExpand{ display: none !important; }
+}
+
+/* === Mobile Mini Player: Apple Music-style dock (v5) ===
+   Goal: no "gap" above iOS Safari bottom UI; controls always visible.
+   Strategy: keep player pinned to bottom:0, extend its background into safe-area,
+   and add body padding-bottom equal to player height + safe-area.
+*/
+:root{
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --mini-player-h: 118px; /* visual height without safe-area */
+  --mini-pad: 12px;
+}
+
+/* Pin the player to the bottom (no lift) */
+.player.mini,
+.mini-player,
+#player.mini{
+  bottom: 0 !important;
+  transform: none !important;
+}
+
+/* Ensure the mini player background extends into safe-area */
+.player.mini,
+.mini-player,
+#player.mini{
+  padding-bottom: calc(var(--mini-pad) + var(--safe-bottom)) !important;
+  min-height: calc(var(--mini-player-h) + var(--safe-bottom)) !important;
+}
+
+/* Keep controls above the safe area */
+.player.mini .controls,
+.mini-player .controls,
+#player.mini .controls{
+  padding-bottom: 0 !important;
+}
+
+/* Give the page enough room so content never hides behind the mini player */
+@media (max-width: 720px){
+  body{
+    padding-bottom: calc(var(--mini-player-h) + var(--safe-bottom) + 14px) !important;
+  }
+}
+
+/* iOS Safari: slightly stronger backdrop to visually merge with bottom UI */
+@supports (-webkit-touch-callout: none){
+  .player.mini,
+  .mini-player,
+  #player.mini{
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    backdrop-filter: blur(22px) saturate(140%);
+  }
 }
