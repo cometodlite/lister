@@ -396,115 +396,37 @@
 window.addEventListener('touchstart', () => {}, { passive: true });
 
 
-/* mini-player v2 (iOS/Android) */
-(function(){
-  const ua = navigator.userAgent || "";
-  const htmlEl = document.documentElement;
-  const isAndroid = /Android/i.test(ua);
-  const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-  if (isAndroid) htmlEl.classList.add("is-android");
-  if (isIOS) htmlEl.classList.add("is-ios");
-
-  function isMobileWidth(){
-    return window.matchMedia("(max-width: 720px)").matches;
+// --- v6: VisualViewport-aware bottom inset (fix iOS/Android browser UI overlap) ---
+function setVisualViewportInsets(){
+  const vv = window.visualViewport;
+  let bottomInset = 0;
+  if(vv){
+    // layout viewport height: window.innerHeight
+    // visual viewport bottom relative to layout: vv.offsetTop + vv.height
+    const visualBottom = vv.offsetTop + vv.height;
+    bottomInset = Math.max(0, Math.round(window.innerHeight - visualBottom));
   }
-
-  function syncPlayerHeightVar(player){
-    if (!player) return;
-    const expanded = player.classList.contains("expanded");
-    const h = expanded ? getComputedStyle(document.documentElement).getPropertyValue("--player-expanded-h").trim()
-                       : getComputedStyle(document.documentElement).getPropertyValue("--player-mini-h").trim();
-    document.documentElement.style.setProperty("--player-current-h", h || (expanded ? "186px":"118px"));
-  }
-
-  function initMiniPlayer(){
-    const player = document.querySelector(".player");
-    const btnExpand = document.getElementById("btnExpand");
-    if (!player || !btnExpand) return;
-
-    // Default on mobile: mini
-    if (isMobileWidth()){
-      player.classList.add("mini");
-      player.classList.remove("expanded");
-    } else {
-      player.classList.remove("mini","expanded");
-    }
-    syncPlayerHeightVar(player);
-
-    const setExpanded = (on) => {
-      if (!isMobileWidth()) return;
-      player.classList.toggle("expanded", on);
-      player.classList.toggle("mini", !on);
-      syncPlayerHeightVar(player);
-    };
-
-    const toggle = () => setExpanded(!player.classList.contains("expanded"));
-
-    btnExpand.addEventListener("click", (e)=>{ e.preventDefault(); toggle(); });
+  // clamp to a sane range (some webviews can report extreme values during animations)
+  bottomInset = Math.max(0, Math.min(180, bottomInset));
+  document.documentElement.style.setProperty('--vv-bottom', bottomInset + 'px');
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', setVisualViewportInsets);
+  window.visualViewport.addEventListener('scroll', setVisualViewportInsets);
+}
+window.addEventListener('resize', setVisualViewportInsets);
+window.addEventListener('orientationchange', setVisualViewportInsets);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) setVisualViewportInsets(); });
+window.addEventListener('load', setVisualViewportInsets);
+setVisualViewportInsets();
 
 
-    // Tap anywhere on the bar (except buttons / sliders) toggles expanded player on mobile
-    player.addEventListener("click", (e)=>{
-      if (!isMobileWidth()) return;
-      if (e.target.closest("button")) return;
-      if (e.target.closest('input[type="range"]')) return;
-      // Only toggle when tapping on non-interactive areas
-      const inPlayer = e.target.closest(".player");
-      if (!inPlayer) return;
-      toggle();
-    });
-
-
-    // Tap on now-playing area toggles (fallback for older markup)
-    const now = player.querySelector(".now") || player.querySelector(".player-left");
-    if (now){
-      now.addEventListener("click", (e)=>{
-        if (!isMobileWidth()) return;
-        if (e.target.closest("button")) return;
-        if (e.target.closest('input[type="range"]')) return;
-        toggle();
-      });
-    }
-
-    // If user interacts with seek/volume, expand automatically
-    const seek = player.querySelector('.seek input[type="range"]') || document.getElementById("seekBar") || document.getElementById("seekbar");
-    const vol  = player.querySelector('.volume input[type="range"]') || document.getElementById("volBar")  || document.getElementById("volbar");
-    [seek, vol].forEach(el=>{
-      if (!el) return;
-      el.addEventListener("pointerdown", ()=> setExpanded(true));
-    });
-
-    // Keep correct state on resize/orientation
-    window.addEventListener("resize", ()=>{
-      if (isMobileWidth()){
-        if (!player.classList.contains("expanded")){
-          player.classList.add("mini");
-        }
-      } else {
-        player.classList.remove("mini","expanded");
-      }
-      syncPlayerHeightVar(player);
-    });
-  }
-
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", initMiniPlayer);
-  } else {
-    initMiniPlayer();
-  }
-})();
-
-
-// --- v5: sync body padding to mini player height (Apple Music-style dock) ---
 function setMiniPlayerHeight(){
   const player = document.getElementById('player') || document.querySelector('.player') || document.querySelector('.mini-player');
   if(!player) return;
-  // measure visible height excluding safe area padding if possible
   const rect = player.getBoundingClientRect();
-  // clamp to reasonable range
   const h = Math.max(88, Math.min(160, Math.round(rect.height)));
-  document.documentElement.style.setProperty('--mini-player-h', (h) + 'px');
+  document.documentElement.style.setProperty('--mini-player-h', h + 'px');
 }
 window.addEventListener('load', setMiniPlayerHeight);
 window.addEventListener('resize', setMiniPlayerHeight);

@@ -612,199 +612,43 @@ button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
   opacity: .95;
 }
 
-
-
-/* ------------------------------
-   Mini Player (iOS/Android) v2
-   - fixes: nav-bar overlap, body padding, guaranteed controls visibility
-   ------------------------------ */
-
-:root{
-  --player-mini-h: 118px;
-  --player-expanded-h: 186px;
-   /* lifted above browser UI */
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Platform classes (set by JS) */
-/* Android nav bar clearance */
-
-/* player positioning */
-.player{
-  bottom: var(
-}
-
-/* Ensure page content is never hidden behind player */
-body{
-  padding-bottom: calc(var(--player-current-h, var(--player-mini-h)) + var(
-}
-
-/* Mobile default: mini */
-@media (max-width: 720px){
-  .player{
-    transition: transform .22s ease, height .22s ease, padding .22s ease, bottom .22s ease;
-  }
-
-  /* collapsed */
-  .player.mini{
-    height: var(--player-mini-h) !important;
-    padding-top: 10px !important;
-  }
-  .player.mini .seek,
-  .player.mini .time,
-  .player.mini .volume,
-  .player.mini .meta{
-    display: none !important;
-  }
-
-  .player.mini .row{
-    align-items: center !important;
-  }
-  .player.mini .now{
-    display: grid !important;
-    grid-template-columns: 60px 1fr;
-    gap: 12px;
-    align-items: center;
-  }
-  .player.mini .now .cover{
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: 16px !important;
-  }
-  .player.mini .now .title{
-    font-size: 15px !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .player.mini .now .artist{
-    font-size: 12px !important;
-    opacity: .75;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* controls must stay visible */
-  .player.mini .controls{
-    gap: 8px !important;
-    margin-top: 10px !important;
-    justify-content: center !important;
-  }
-  .player.mini .controls .icon-btn{
-    width: 46px !important;
-    height: 46px !important;
-    border-radius: 16px !important;
-  }
-  .player.mini #btnToggle.big{
-    width: 54px !important;
-    height: 54px !important;
-  }
-
-  /* expanded */
-  .player.expanded{
-    height: var(--player-expanded-h) !important;
-  }
-  .player.expanded .seek,
-  .player.expanded .time,
-  .player.expanded .volume,
-  .player.expanded .meta{
-    display: block !important;
-  }
-  .player.expanded .meta{
-    display: flex !important;
-  }
-
-  /* Expand button rotation */
-  .player.expanded #btnExpand .i-expand{ transform: rotate(180deg); }
-  #btnExpand .icon{ transition: transform .18s ease; }
-}
-
-
-/* extra lift safety */
-@media (max-width: 720px){
-  .player{ padding-bottom: calc(10px + var(--safe-bottom)) !important; }
-}
-
-
-/* ------------------------------
-   Mobile Topbar layout fix (iOS/Android)
-   - removes empty right space
-   - Apple Music-like stacked layout
-   ------------------------------ */
-@media (max-width: 720px){
-  .topbar{
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 12px;
-  }
-  .topbar .brand{ order: 1; }
-  .topbar .topbar-actions{
-    order: 2;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .topbar .topbar-actions .search{
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  .topbar .nav{
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-/* Mini player: hide explicit expand button on mobile (tap bar to expand) */
-@media (max-width: 720px){
-  #btnExpand{ display: none !important; }
-}
-
-/* === Mobile Mini Player: Apple Music-style dock (v5) ===
-   Goal: no "gap" above iOS Safari bottom UI; controls always visible.
-   Strategy: keep player pinned to bottom:0, extend its background into safe-area,
-   and add body padding-bottom equal to player height + safe-area.
+/* === Mobile Mini Player Dock (v6): VisualViewport + Safe-Area ===
+   Fixes iOS/Android bottom UI overlap without creating a gap.
+   - Bottom position follows visual viewport (browser UI / in-app UI)
+   - Background extends into safe-area (home indicator)
 */
 :root{
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --mini-player-h: 118px; /* visual height without safe-area */
+  --vv-bottom: 0px;            /* dynamic bottom inset from VisualViewport */
+  --mini-player-h: 118px;      /* visual height (without safe area) */
   --mini-pad: 12px;
 }
 
-/* Pin the player to the bottom (no lift) */
-.player.mini,
-.mini-player,
-#player.mini{
-  bottom: 0 !important;
-  transform: none !important;
-}
-
-/* Ensure the mini player background extends into safe-area */
-.player.mini,
-.mini-player,
-#player.mini{
-  padding-bottom: calc(var(--mini-pad) + var(--safe-bottom)) !important;
-  min-height: calc(var(--mini-player-h) + var(--safe-bottom)) !important;
-}
-
-/* Keep controls above the safe area */
-.player.mini .controls,
-.mini-player .controls,
-#player.mini .controls{
-  padding-bottom: 0 !important;
-}
-
-/* Give the page enough room so content never hides behind the mini player */
+/* Pin to visual viewport bottom (no lift gaps) */
 @media (max-width: 720px){
+  .player.mini,
+  .mini-player,
+  #player.mini{
+    bottom: var(--vv-bottom) !important;
+    transform: none !important;
+    padding-bottom: calc(var(--mini-pad) + var(--safe-bottom)) !important;
+    min-height: calc(var(--mini-player-h) + var(--safe-bottom)) !important;
+  }
+
+  /* Keep controls above safe-area */
+  .player.mini .controls,
+  .mini-player .controls,
+  #player.mini .controls{
+    padding-bottom: 0 !important;
+  }
+
+  /* Reserve space so content is never hidden behind the player */
   body{
-    padding-bottom: calc(var(--mini-player-h) + var(--safe-bottom) + 14px) !important;
+    padding-bottom: calc(var(--mini-player-h) + var(--safe-bottom) + var(--vv-bottom) + 14px) !important;
   }
 }
 
-/* iOS Safari: slightly stronger backdrop to visually merge with bottom UI */
+/* Slightly stronger backdrop on iOS */
 @supports (-webkit-touch-callout: none){
   .player.mini,
   .mini-player,
