@@ -443,11 +443,26 @@ window.addEventListener('touchstart', () => {}, { passive: true });
 
     btnExpand.addEventListener("click", (e)=>{ e.preventDefault(); toggle(); });
 
-    // Tap on now-playing area toggles
-    const now = player.querySelector(".now");
+
+    // Tap anywhere on the bar (except buttons / sliders) toggles expanded player on mobile
+    player.addEventListener("click", (e)=>{
+      if (!isMobileWidth()) return;
+      if (e.target.closest("button")) return;
+      if (e.target.closest('input[type="range"]')) return;
+      // Only toggle when tapping on non-interactive areas
+      const inPlayer = e.target.closest(".player");
+      if (!inPlayer) return;
+      toggle();
+    });
+
+
+    // Tap on now-playing area toggles (fallback for older markup)
+    const now = player.querySelector(".now") || player.querySelector(".player-left");
     if (now){
       now.addEventListener("click", (e)=>{
+        if (!isMobileWidth()) return;
         if (e.target.closest("button")) return;
+        if (e.target.closest('input[type="range"]')) return;
         toggle();
       });
     }

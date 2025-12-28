@@ -726,3 +726,40 @@ body{
 @media (max-width: 720px){
   .player{ padding-bottom: calc(10px + var(--safe-bottom)) !important; }
 }
+
+
+/* ------------------------------
+   Mobile Topbar layout fix (iOS/Android)
+   - removes empty right space
+   - Apple Music-like stacked layout
+   ------------------------------ */
+@media (max-width: 720px){
+  .topbar{
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .topbar .brand{ order: 1; }
+  .topbar .topbar-actions{
+    order: 2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .topbar .topbar-actions .search{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .topbar .nav{
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Mini player: hide explicit expand button on mobile (tap bar to expand) */
+@media (max-width: 720px){
+  #btnExpand{ display: none !important; }
+}
