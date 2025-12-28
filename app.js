@@ -385,6 +385,38 @@
     }
   }
 
+  // --- Mobile bottom UI overlap fix (iOS Safari / iOS in-app browsers / Android Chrome)
+  // Many mobile browsers draw their own bottom toolbars that can overlap fixed elements.
+  // We use VisualViewport when available and feed the delta into --player-bottom.
+  (function setupPlayerViewportLift(){
+    const root = document.documentElement;
+
+    function compute(){
+      const vv = window.visualViewport;
+      // fallback: 0
+      let lift = 0;
+      if (vv){
+        // When browser UI (or keyboard) reduces visual viewport height, innerHeight stays larger.
+        // The difference is the hidden area at bottom.
+        const hidden = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        // Keep a small margin so controls never kiss the toolbar.
+        lift = Math.round(hidden);
+      }
+
+      // cap: avoid jumping too high
+      lift = Math.min(Math.max(lift, 0), 160);
+      root.style.setProperty('--player-bottom', `${lift}px`);
+    }
+
+    compute();
+    window.addEventListener('resize', compute, { passive: true });
+    window.addEventListener('orientationchange', compute, { passive: true });
+    if (window.visualViewport){
+      window.visualViewport.addEventListener('resize', compute, { passive: true });
+      window.visualViewport.addEventListener('scroll', compute, { passive: true });
+    }
+  })();
+
   init().catch((err) => {
     console.error(err);
     results.classList.add('empty');
