@@ -34,6 +34,49 @@
   const btnShuffle = $('#btnShuffle');
   const btnQueueOpen = $('#btnQueueOpen');
 
+  // --- Mobile viewport + fixed player helpers (iOS/Android) ---
+  const player = $('#player');
+  const brand = $('#brand');
+
+  function syncPlayerHeight(){
+    if (!player) return;
+    const h = Math.round(player.getBoundingClientRect().height || 0);
+    if (h > 0) document.documentElement.style.setProperty('--player-h', `${h}px`);
+
+    // Keep safe-area in sync for iOS (0 on others)
+    const safeBottom = getComputedStyle(document.documentElement)
+      .getPropertyValue('--safe-bottom')
+      .trim();
+    if (!safeBottom) {
+      // no-op: CSS env() handles it.
+    }
+  }
+
+  // iOS/Android address-bar + keyboard changes
+  function bindViewportSync(){
+    syncPlayerHeight();
+    window.addEventListener('resize', syncPlayerHeight, {passive:true});
+    window.addEventListener('orientationchange', ()=>setTimeout(syncPlayerHeight, 250), {passive:true});
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', syncPlayerHeight, {passive:true});
+      window.visualViewport.addEventListener('scroll', syncPlayerHeight, {passive:true});
+    }
+  }
+
+  // Brand should always jump to top reliably (anchors can fail in in-app browsers)
+  function bindBrandToTop(){
+    if (!brand) return;
+    brand.addEventListener('click', (e)=>{
+      e.preventDefault();
+      // Reset hash without pushing a new history entry
+      if (location.hash !== '#home') history.replaceState(null, '', '#home');
+      // Robust scroll-to-top
+      window.scrollTo({top:0, left:0, behavior:'smooth'});
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }
+
   let library = null; // loaded json
   let flatTracks = [];
   let queue = [];
@@ -68,6 +111,20 @@
   function normalize(s){ return (s || '').toLowerCase().trim(); }
 
   function pushQueue(track, playNow=false){
+    if (!track) return;
+
+    // Dedupe: if the track already exists in the queue, jump to it
+    // instead of endlessly appending ("Up Next" 무한 증가 방지).
+    const existing = queue.findIndex(t => t?.src === track?.src);
+    if (existing !== -1){
+      if (playNow){
+        idx = existing;
+        renderQueue();
+        loadAndPlayCurrent();
+      }
+      return;
+    }
+
     queue.push(track);
     renderQueue();
     if (playNow){
@@ -263,7 +320,7 @@
     const t = normalize(term);
     if (!t){
       results.classList.add('empty');
-      results.textContent = '검색어를 입력해봐.';
+      results.textContent = '검색어를 입력해 주세요.';
       return;
     }
     const hits = flatTracks.filter(x => normalize(x.title).includes(t) || normalize(x.artist).includes(t));
@@ -368,6 +425,10 @@
     bindPlayer();
     bindUX();
 
+    // Mobile/tablet reliability tweaks
+    bindBrandToTop();
+    bindViewportSync();
+
     const res = await fetch('artists.json', { cache: 'no-store' });
     library = await res.json();
 
@@ -388,7 +449,7 @@
   init().catch((err) => {
     console.error(err);
     results.classList.add('empty');
-    results.textContent = 'artists.json을 불러오지 못했어. GitHub Pages 경로/파일명을 확인해줘.';
+    results.textContent = 'artists.json을 불러올 수 없습니다. GitHub Pages 경로/파일명을 확인해 주세요.';
   });
 })();
 

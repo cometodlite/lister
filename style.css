@@ -18,6 +18,8 @@
   --accent3:#60A5FA;
 
   --player-h: 100px;
+  /* iOS safe-area bottom inset (0 on non-notch / non-iOS). */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Light theme */
@@ -45,7 +47,8 @@ body{
     radial-gradient(900px 620px at 92% 6%, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0) 60%),
     radial-gradient(900px 620px at 70% 90%, rgba(96,165,250,0.14) 0%, rgba(96,165,250,0) 60%),
     linear-gradient(180deg, var(--bg), var(--bg2));
-  padding-bottom: calc(var(--player-h) + 18px);
+  /* Reserve space for the fixed player (plus iOS safe-area). */
+  padding-bottom: calc(var(--player-h) + 18px + env(safe-area-inset-bottom, 0px));
 }
 
 a{ color: inherit; text-decoration: none; }
@@ -353,7 +356,8 @@ code{
   align-items:center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  /* Bottom padding includes safe-area to avoid iOS in-app browser bars. */
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
   border-top: 1px solid var(--stroke2);
   background: color-mix(in oklab, var(--bg) 70%, transparent);
   backdrop-filter: blur(12px);
