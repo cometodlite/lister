@@ -34,49 +34,6 @@
   const btnShuffle = $('#btnShuffle');
   const btnQueueOpen = $('#btnQueueOpen');
 
-  // --- Mobile viewport + fixed player helpers (iOS/Android) ---
-  const player = $('#player');
-  const brand = $('#brand');
-
-  function syncPlayerHeight(){
-    if (!player) return;
-    const h = Math.round(player.getBoundingClientRect().height || 0);
-    if (h > 0) document.documentElement.style.setProperty('--player-h', `${h}px`);
-
-    // Keep safe-area in sync for iOS (0 on others)
-    const safeBottom = getComputedStyle(document.documentElement)
-      .getPropertyValue('--safe-bottom')
-      .trim();
-    if (!safeBottom) {
-      // no-op: CSS env() handles it.
-    }
-  }
-
-  // iOS/Android address-bar + keyboard changes
-  function bindViewportSync(){
-    syncPlayerHeight();
-    window.addEventListener('resize', syncPlayerHeight, {passive:true});
-    window.addEventListener('orientationchange', ()=>setTimeout(syncPlayerHeight, 250), {passive:true});
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', syncPlayerHeight, {passive:true});
-      window.visualViewport.addEventListener('scroll', syncPlayerHeight, {passive:true});
-    }
-  }
-
-  // Brand should always jump to top reliably (anchors can fail in in-app browsers)
-  function bindBrandToTop(){
-    if (!brand) return;
-    brand.addEventListener('click', (e)=>{
-      e.preventDefault();
-      // Reset hash without pushing a new history entry
-      if (location.hash !== '#home') history.replaceState(null, '', '#home');
-      // Robust scroll-to-top
-      window.scrollTo({top:0, left:0, behavior:'smooth'});
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    });
-  }
-
   let library = null; // loaded json
   let flatTracks = [];
   let queue = [];
@@ -111,20 +68,6 @@
   function normalize(s){ return (s || '').toLowerCase().trim(); }
 
   function pushQueue(track, playNow=false){
-    if (!track) return;
-
-    // Dedupe: if the track already exists in the queue, jump to it
-    // instead of endlessly appending ("Up Next" 무한 증가 방지).
-    const existing = queue.findIndex(t => t?.src === track?.src);
-    if (existing !== -1){
-      if (playNow){
-        idx = existing;
-        renderQueue();
-        loadAndPlayCurrent();
-      }
-      return;
-    }
-
     queue.push(track);
     renderQueue();
     if (playNow){
@@ -148,7 +91,7 @@
     setNow(track);
     audio.src = track.src;
     if (autoPlay){
-      audio.play().catch(()=>{ btnToggle.classList.remove("is-playing"); });
+      audio.play().catch(()=>{ btnToggle.textContent = '▶'; });
     }
     highlightPlaying(track);
   }
@@ -320,7 +263,7 @@
     const t = normalize(term);
     if (!t){
       results.classList.add('empty');
-      results.textContent = '검색어를 입력해 주세요.';
+      results.textContent = '검색어를 입력해봐.';
       return;
     }
     const hits = flatTracks.filter(x => normalize(x.title).includes(t) || normalize(x.artist).includes(t));
@@ -364,7 +307,7 @@
         audio.volume = Number(vol.value);
         if (audio.muted && audio.volume > 0){
           audio.muted = false;
-          btnMute.classList.remove("is-muted");
+          btnMute.textContent = '🔊';
         }
       });
     }
@@ -389,8 +332,8 @@
       }
     });
 
-    audio.addEventListener('play', () => { btnToggle.classList.add('is-playing'); });
-    audio.addEventListener('pause', () => { btnToggle.classList.remove('is-playing'); });
+    audio.addEventListener('play', () => { btnToggle.textContent = '⏸'; });
+    audio.addEventListener('pause', () => { btnToggle.textContent = '▶'; });
     audio.addEventListener('ended', next);
   }
 
@@ -425,10 +368,6 @@
     bindPlayer();
     bindUX();
 
-    // Mobile/tablet reliability tweaks
-    bindBrandToTop();
-    bindViewportSync();
-
     const res = await fetch('artists.json', { cache: 'no-store' });
     library = await res.json();
 
@@ -449,46 +388,6 @@
   init().catch((err) => {
     console.error(err);
     results.classList.add('empty');
-    results.textContent = 'artists.json을 불러올 수 없습니다. GitHub Pages 경로/파일명을 확인해 주세요.';
+    results.textContent = 'artists.json을 불러오지 못했어. GitHub Pages 경로/파일명을 확인해줘.';
   });
 })();
-
-// mobile-tap
-window.addEventListener('touchstart', () => {}, { passive: true });
-
-
-// --- v6: VisualViewport-aware bottom inset (fix iOS/Android browser UI overlap) ---
-function setVisualViewportInsets(){
-  const vv = window.visualViewport;
-  let bottomInset = 0;
-  if(vv){
-    // layout viewport height: window.innerHeight
-    // visual viewport bottom relative to layout: vv.offsetTop + vv.height
-    const visualBottom = vv.offsetTop + vv.height;
-    bottomInset = Math.max(0, Math.round(window.innerHeight - visualBottom));
-  }
-  // clamp to a sane range (some webviews can report extreme values during animations)
-  bottomInset = Math.max(0, Math.min(180, bottomInset));
-  document.documentElement.style.setProperty('--vv-bottom', bottomInset + 'px');
-}
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize', setVisualViewportInsets);
-  window.visualViewport.addEventListener('scroll', setVisualViewportInsets);
-}
-window.addEventListener('resize', setVisualViewportInsets);
-window.addEventListener('orientationchange', setVisualViewportInsets);
-document.addEventListener('visibilitychange', () => { if(!document.hidden) setVisualViewportInsets(); });
-window.addEventListener('load', setVisualViewportInsets);
-setVisualViewportInsets();
-
-
-function setMiniPlayerHeight(){
-  const player = document.getElementById('player') || document.querySelector('.player') || document.querySelector('.mini-player');
-  if(!player) return;
-  const rect = player.getBoundingClientRect();
-  const h = Math.max(88, Math.min(160, Math.round(rect.height)));
-  document.documentElement.style.setProperty('--mini-player-h', h + 'px');
-}
-window.addEventListener('load', setMiniPlayerHeight);
-window.addEventListener('resize', setMiniPlayerHeight);
-document.addEventListener('visibilitychange', () => { if(!document.hidden) setMiniPlayerHeight(); });

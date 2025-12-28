@@ -18,8 +18,6 @@
   --accent3:#60A5FA;
 
   --player-h: 100px;
-  /* iOS safe-area bottom inset (0 on non-notch / non-iOS). */
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Light theme */
@@ -47,8 +45,7 @@ body{
     radial-gradient(900px 620px at 92% 6%, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0) 60%),
     radial-gradient(900px 620px at 70% 90%, rgba(96,165,250,0.14) 0%, rgba(96,165,250,0) 60%),
     linear-gradient(180deg, var(--bg), var(--bg2));
-  /* Reserve space for the fixed player (plus iOS safe-area). */
-  padding-bottom: calc(var(--player-h) + 18px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--player-h) + 18px);
 }
 
 a{ color: inherit; text-decoration: none; }
@@ -356,8 +353,7 @@ code{
   align-items:center;
   justify-content: space-between;
   gap: 12px;
-  /* Bottom padding includes safe-area to avoid iOS in-app browser bars. */
-  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
+  padding: 14px 16px;
   border-top: 1px solid var(--stroke2);
   background: color-mix(in oklab, var(--bg) 70%, transparent);
   backdrop-filter: blur(12px);
@@ -384,6 +380,93 @@ code{
 .player-right{ display:flex; align-items:center; gap: 10px; min-width: 170px; justify-content: flex-end; }
 #vol{ width: 110px; }
 
+/*
+  Range (seek/volume)
+  - iOS Safari에서 backdrop-filter/투명 배경 위에 range가 '안 보이는' 케이스가 있어
+    트랙/썸을 명시적으로 그려서 항상 보이게 처리.
+*/
+input[type="range"]{
+  -webkit-appearance: none;
+  appearance: none;
+  height: 24px;              /* 터치 영역 */
+  background: transparent;
+  outline: none;
+}
+
+/* WebKit (iOS Safari / Chrome iOS) */
+input[type="range"]::-webkit-slider-runnable-track{
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid rgba(255,255,255,0.85);
+  margin-top: -5px;          /* (thumb 16px - track 6px)/2 */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track{
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+}
+input[type="range"]::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid rgba(255,255,255,0.85);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* iOS에서 클릭/드래그 감도 */
+#seekbar, #vol{ touch-action: pan-x; }
+
+/* Range (seek/volume) – iOS/Safari에서도 확실히 보이게 커스텀 */
+input[type="range"]{
+  -webkit-appearance: none;
+  appearance: none;
+  height: 24px;              /* 터치 영역 */
+  background: transparent;
+  outline: none;
+}
+
+/* WebKit (iOS Safari / Chrome iOS) */
+input[type="range"]::-webkit-slider-runnable-track{
+  height: 6px;
+  background: rgba(255,255,255,.14);
+  border-radius: 999px;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid rgba(255,255,255,.85);
+  margin-top: -5px; /* thumb을 트랙 중앙에 */
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track{
+  height: 6px;
+  background: rgba(255,255,255,.14);
+  border-radius: 999px;
+}
+input[type="range"]::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid rgba(255,255,255,.85);
+}
+
 /* Responsive */
 @media (max-width: 900px){
   .hero{ grid-template-columns: 1fr; }
@@ -397,267 +480,4 @@ code{
   .player-left{ min-width: 100%; }
   .player-right{ min-width: 100%; justify-content: space-between; }
   .seek{ width: 100%; }
-}
-
-
-
-/* ------------------------------
-   Mobile responsive add-on (v1)
-   ------------------------------ */
-:root{
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-top: env(safe-area-inset-top, 0px);
-}
-
-/* Improve tap targets */
-button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Make header wrap nicely on small screens */
-@media (max-width: 900px){
-  header.topbar{
-    padding: 10px 12px;
-  }
-  .topbar .right{
-    gap: 8px;
-  }
-  .topbar .nav{
-    gap: 8px;
-  }
-  .topbar .nav a{
-    padding: 10px 12px;
-    border-radius: 999px;
-  }
-}
-
-@media (max-width: 720px){
-  /* Overall gutters */
-  .container{
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  /* Topbar becomes 2-row */
-  header.topbar{
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding-top: calc(10px + var(--safe-top));
-    backdrop-filter: blur(14px);
-  }
-  .topbar{
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .topbar .brand{
-    flex: 1 1 auto;
-    min-width: 140px;
-  }
-  .topbar .nav{
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .topbar .nav::-webkit-scrollbar{ display:none; }
-
-  .topbar .search{
-    order: 2;
-    flex: 1 1 100%;
-    width: 100%;
-  }
-  .search input{
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-
-  /* Hero grid -> single column */
-  .hero-grid{
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-  .hero-card{
-    padding: 18px !important;
-  }
-  .hero-title{
-    font-size: 34px !important;
-    line-height: 1.08 !important;
-    letter-spacing: -0.02em;
-  }
-
-  /* Stats cards stack */
-  .hero-stats{
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-  }
-  .stat-card{
-    padding: 12px !important;
-  }
-
-  /* Featured card */
-  .featured-card{
-    padding: 16px !important;
-  }
-  .featured-row{
-    grid-template-columns: 72px 1fr !important;
-    gap: 12px !important;
-  }
-  .cover{
-    width: 72px !important;
-    height: 72px !important;
-  }
-
-  /* Artists list */
-  .artist-card{
-    padding: 14px !important;
-  }
-  .artist-head{
-    gap: 10px !important;
-  }
-  .artist-meta .name{
-    font-size: 16px !important;
-  }
-
-  /* Tracks: increase spacing */
-  .track{
-    padding: 12px 12px !important;
-    border-radius: 14px !important;
-  }
-  .track .title{
-    font-size: 15px !important;
-  }
-  .track .right{
-    gap: 8px !important;
-  }
-
-  /* Library columns -> stack */
-  .library-grid{
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-
-  /* Bottom player: larger, safe-area padding */
-  .player{
-    padding-bottom: calc(10px + var(--safe-bottom)) !important;
-  }
-  .player .row{
-    gap: 10px !important;
-  }
-  .player .now{
-    min-width: 0 !important;
-  }
-  .player .now .title{
-    font-size: 14px !important;
-  }
-  .player .controls button{
-    width: 46px !important;
-    height: 46px !important;
-    border-radius: 14px !important;
-  }
-  .player .seek{
-    min-width: 0 !important;
-  }
-  .player input[type="range"]{
-    height: 6px !important;
-  }
-
-  /* Reduce heavy shadows on mobile for performance */
-  .glass{
-    box-shadow: 0 18px 50px rgba(0,0,0,.20) !important;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 420px){
-  .hero-title{ font-size: 30px !important; }
-  .hero-stats{ grid-template-columns: 1fr !important; }
-  .player .meta{ display:none !important; }
-}
-
-
-
-/* ------------------------------
-   Icons (Apple-music-ish, no emoji)
-   ------------------------------ */
-.icon{
-  width: 18px;
-  height: 18px;
-  display: inline-block;
-  background: currentColor;
-  -webkit-mask: var(--icon) center/contain no-repeat;
-  mask: var(--icon) center/contain no-repeat;
-}
-.icon-btn.big .icon{
-  width: 20px;
-  height: 20px;
-}
-.i-prev{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%205h2v14H6zM18%206.5v11L9%2012z%22/%3E%3C/svg%3E"); }
-.i-next{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M16%205h2v14h-2zM6%206.5v11L15%2012z%22/%3E%3C/svg%3E"); }
-.i-play{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M8%205v14l11-7z%22/%3E%3C/svg%3E"); }
-.i-pause{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%205h4v14H7zM13%205h4v14h-4z%22/%3E%3C/svg%3E"); }
-.i-volume{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16.5%2012a3.5%203.5%200%200%200-2-3.16v6.32a3.5%203.5%200%200%200%202-3.16z%22/%3E%3Cpath%20d%3D%22M14.5%205.5v2.2a6.5%206.5%200%200%201%200%208.6v2.2a8.7%208.7%200%200%200%200-13.2z%22/%3E%3C/svg%3E"); }
-.i-mute{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16%209l5%205m0-5-5%205%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E"); }
-.i-theme{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%203a9%209%200%201%200%200%2018V3z%22/%3E%3Cpath%20d%3D%22M12%203a9%209%200%200%201%200%2018%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22/%3E%3C/svg%3E"); }
-
-/* When playing, show pause icon */
-#btnToggle.is-playing .i-play{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%205h4v14H7zM13%205h4v14h-4z%22/%3E%3C/svg%3E"); }
-
-/* When muted, show mute icon */
-#btnMute.is-muted .i-volume{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2010v4h4l5%204V6L7%2010H3z%22/%3E%3Cpath%20d%3D%22M16%209l5%205m0-5-5%205%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E"); }
-
-/* Icon buttons visual polish */
-.icon-btn{
-  font-size: 0; /* hide any accidental text spacing */
-}
-.icon-btn .icon{
-  opacity: .95;
-}
-
-/* === Mobile Mini Player Dock (v6): VisualViewport + Safe-Area ===
-   Fixes iOS/Android bottom UI overlap without creating a gap.
-   - Bottom position follows visual viewport (browser UI / in-app UI)
-   - Background extends into safe-area (home indicator)
-*/
-:root{
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --vv-bottom: 0px;            /* dynamic bottom inset from VisualViewport */
-  --mini-player-h: 118px;      /* visual height (without safe area) */
-  --mini-pad: 12px;
-}
-
-/* Pin to visual viewport bottom (no lift gaps) */
-@media (max-width: 720px){
-  .player.mini,
-  .mini-player,
-  #player.mini{
-    bottom: var(--vv-bottom) !important;
-    transform: none !important;
-    padding-bottom: calc(var(--mini-pad) + var(--safe-bottom)) !important;
-    min-height: calc(var(--mini-player-h) + var(--safe-bottom)) !important;
-  }
-
-  /* Keep controls above safe-area */
-  .player.mini .controls,
-  .mini-player .controls,
-  #player.mini .controls{
-    padding-bottom: 0 !important;
-  }
-
-  /* Reserve space so content is never hidden behind the player */
-  body{
-    padding-bottom: calc(var(--mini-player-h) + var(--safe-bottom) + var(--vv-bottom) + 14px) !important;
-  }
-}
-
-/* Slightly stronger backdrop on iOS */
-@supports (-webkit-touch-callout: none){
-  .player.mini,
-  .mini-player,
-  #player.mini{
-    -webkit-backdrop-filter: blur(22px) saturate(140%);
-    backdrop-filter: blur(22px) saturate(140%);
-  }
 }

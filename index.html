@@ -22,10 +22,10 @@
 
     <div class="topbar-actions">
       <div class="search">
-        <input id="q" type="search" placeholder="곡 또는 아티스트 검색" autocomplete="off" />
+        <input id="q" type="search" placeholder="곡 / 아티스트 검색" autocomplete="off" />
         <kbd class="kbd">/</kbd>
       </div>
-      <button id="btnTheme" class="icon-btn" title="테마 전환" aria-label="테마 전환"><span class="icon i-theme" aria-hidden="true"></span></button>
+      <button id="btnTheme" class="icon-btn" title="테마 전환">🌓</button>
     </div>
   </header>
 
@@ -36,8 +36,8 @@
         
 
         <div class="hero-cta">
-          <button class="btn" id="btnFeatured">추천곡 재생</button>
-          <button class="btn btn-ghost" id="btnShuffle">셔플</button>
+          <button class="btn" id="btnFeatured">▶ 추천곡 재생</button>
+          <button class="btn btn-ghost" id="btnShuffle">🔀 셔플</button>
         </div>
 
         <div class="hero-stats" aria-label="stats">
@@ -50,7 +50,7 @@
       <div class="hero-right">
         <div class="featured-card" id="featuredCard" aria-label="featured track">
           <div class="featured-cover-wrap">
-            <img id="featuredCover" class="featured-cover" src="assets/lunatic_mythtic_cover.png" alt="featured cover" />
+            <img id="featuredCover" class="featured-cover" src="assets/cover-aurora.svg" alt="featured cover" />
           </div>
           <div class="featured-meta">
             <div class="pill">FEATURED</div>
@@ -98,7 +98,7 @@
   <!-- Player -->
   <footer class="player" id="player" aria-label="player">
     <div class="player-left">
-      <img id="nowCover" class="now-cover" src="assets/lunatic_mythtic_cover.png" alt="cover" />
+      <img id="nowCover" class="now-cover" src="assets/cover-aurora.svg" alt="cover" />
       <div class="now-meta">
         <div id="nowTitle" class="now-title">재생 중인 곡 없음</div>
         <div id="nowArtist" class="now-artist">—</div>
@@ -107,9 +107,9 @@
 
     <div class="player-center">
       <div class="controls">
-        <button class="icon-btn" id="btnPrev" title="이전" aria-label="이전"><span class="icon i-prev" aria-hidden="true"></span></button>
-        <button class="icon-btn big" id="btnToggle" title="재생/일시정지" aria-label="재생/일시정지"><span class="icon i-play" aria-hidden="true"></span></button>
-        <button class="icon-btn" id="btnNext" title="다음" aria-label="다음"><span class="icon i-next" aria-hidden="true"></span></button>
+        <button class="icon-btn" id="btnPrev" title="이전">⏮</button>
+        <button class="icon-btn big" id="btnToggle" title="재생/일시정지">▶</button>
+        <button class="icon-btn" id="btnNext" title="다음">⏭</button>
       </div>
 
       <div class="seek">
@@ -120,7 +120,7 @@
     </div>
 
     <div class="player-right">
-      <button class="icon-btn" id="btnMute" title="음량" aria-label="음량"><span class="icon i-volume" aria-hidden="true"></span></button>
+      <button class="icon-btn" id="btnMute" title="음소거">🔊</button>
       <input id="vol" type="range" min="0" max="1" step="0.01" value="0.9" title="볼륨" />
     </div>
 
