@@ -486,10 +486,9 @@ input[type="range"]::-moz-range-thumb{
   .player-right{ min-width: 100%; justify-content: space-between; }
   .seek{ width: 100%; }
 
-  /* iOS(특히 인스타그램/라인 등 인앱 브라우저)에서 하단 툴바가 겹치면
-     seekbar가 가장 아래에 있을 때 눈에 안 보이는 경우가 있어서
-     모바일에서는 seekbar를 컨트롤 위로 올린다. */
+  /* 모바일 컨트롤 배치(기본): 버튼(이전/재생/다음) → 진행바(Seek)
+     iOS 인앱 브라우저에서도 진행바가 가려지지 않도록 JS에서 바 전체를 추가로 띄운다. */
   .player-center{ gap: 6px; }
-  .player-center .seek{ order: 1; }
-  .player-center .controls{ order: 2; }
+  .player-center .controls{ order: 1; }
+  .player-center .seek{ order: 2; }
 }

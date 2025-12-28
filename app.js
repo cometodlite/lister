@@ -399,9 +399,18 @@
         // When browser UI (or keyboard) reduces visual viewport height, innerHeight stays larger.
         // The difference is the hidden area at bottom.
         const hidden = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-        // Keep a small margin so controls never kiss the toolbar.
+        // Keep a margin so controls never kiss the toolbar.
         lift = Math.round(hidden);
       }
+
+      // Extra baseline lift (especially for iOS in-app browsers like Instagram)
+      // where the bottom toolbar can overlap fixed elements without changing VisualViewport reliably.
+      const ua = navigator.userAgent || '';
+      const isIOS = /iP(hone|od|ad)/i.test(ua) || (/(Macintosh)/i.test(ua) && 'ontouchend' in document);
+      const isInApp = /(Instagram|FBAN|FBAV|Line|KAKAOTALK|NAVER|Daum|Whale)/i.test(ua);
+      // tuned: a bit more lift so the bar isn't tight to the bottom UI
+      const base = isIOS ? (isInApp ? 30 : 18) : 12;
+      lift += base;
 
       // cap: avoid jumping too high
       lift = Math.min(Math.max(lift, 0), 160);
