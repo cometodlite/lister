@@ -394,3 +394,79 @@
 
 // mobile-tap
 window.addEventListener('touchstart', () => {}, { passive: true });
+
+
+/* mini-player */
+(function(){
+  const ua = navigator.userAgent || "";
+  const htmlEl = document.documentElement;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+  if (isAndroid) htmlEl.classList.add("is-android");
+  if (isIOS) htmlEl.classList.add("is-ios");
+
+  function isMobileWidth(){
+    return window.matchMedia("(max-width: 720px)").matches;
+  }
+
+  function initMiniPlayer(){
+    const player = document.querySelector(".player");
+    const btnExpand = document.getElementById("btnExpand");
+    if (!player || !btnExpand) return;
+
+    // Default on mobile: mini
+    if (isMobileWidth()){
+      player.classList.add("mini");
+      player.classList.remove("expanded");
+    } else {
+      player.classList.remove("mini","expanded");
+    }
+
+    const toggle = () => {
+      if (!isMobileWidth()) return;
+      const expanded = player.classList.toggle("expanded");
+      player.classList.toggle("mini", !expanded);
+    };
+
+    btnExpand.addEventListener("click", (e)=>{ e.preventDefault(); toggle(); });
+
+    // Tap on now-playing area toggles
+    const now = player.querySelector(".now");
+    if (now){
+      now.addEventListener("click", (e)=>{
+        if (e.target.closest("button")) return;
+        toggle();
+      });
+    }
+
+    // If user interacts with seek/volume, expand automatically
+    const seek = player.querySelector('.seek input[type="range"]') || document.getElementById("seekBar") || document.getElementById("seekbar");
+    const vol  = player.querySelector('.volume input[type="range"]') || document.getElementById("volBar")  || document.getElementById("volbar");
+    [seek, vol].forEach(el=>{
+      if (!el) return;
+      el.addEventListener("pointerdown", ()=>{
+        if (!isMobileWidth()) return;
+        player.classList.add("expanded");
+        player.classList.remove("mini");
+      });
+    });
+
+    // Keep correct state on resize/orientation
+    window.addEventListener("resize", ()=>{
+      if (isMobileWidth()){
+        if (!player.classList.contains("expanded")){
+          player.classList.add("mini");
+        }
+      } else {
+        player.classList.remove("mini","expanded");
+      }
+    });
+  }
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initMiniPlayer);
+  } else {
+    initMiniPlayer();
+  }
+})();

@@ -611,3 +611,97 @@ button, .btn, .chip, .nav a, .track, .artist-card, .icon-btn{
 .icon-btn .icon{
   opacity: .95;
 }
+
+
+.i-expand{ --icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E"); }
+
+
+
+/* ------------------------------
+   Mini Player (iOS/Android)
+   ------------------------------ */
+
+/* Platform classes (set by JS) */
+html.is-ios .player{ padding-bottom: calc(10px + var(--safe-bottom)) !important; }
+html.is-android .player{ padding-bottom: 72px !important; } /* Android nav bar clearance */
+
+/* Mobile default: mini */
+@media (max-width: 720px){
+  .player{
+    transition: transform .22s ease, height .22s ease, padding .22s ease;
+  }
+
+  /* collapsed */
+  .player.mini{
+    height: 98px !important;
+    padding-top: 10px !important;
+  }
+  .player.mini .seek,
+  .player.mini .time,
+  .player.mini .volume,
+  .player.mini .meta{
+    display: none !important;
+  }
+
+  .player.mini .row{
+    align-items: center !important;
+  }
+  .player.mini .now{
+    display: grid !important;
+    grid-template-columns: 56px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .player.mini .now .cover{
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 14px !important;
+  }
+  .player.mini .now .title{
+    font-size: 15px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player.mini .now .artist{
+    font-size: 12px !important;
+    opacity: .75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player.mini .controls{
+    gap: 8px !important;
+  }
+  .player.mini .controls .icon-btn{
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+  }
+  .player.mini #btnToggle.big{
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  /* expanded */
+  .player.expanded{
+    height: 168px !important;
+  }
+  .player.expanded .seek,
+  .player.expanded .time,
+  .player.expanded .volume,
+  .player.expanded .meta{
+    display: block !important;
+  }
+  .player.expanded .meta{
+    display: flex !important;
+  }
+
+  /* Expand button rotation */
+  .player.expanded #btnExpand .i-expand{
+    transform: rotate(180deg);
+  }
+  #btnExpand .icon{
+    transition: transform .18s ease;
+  }
+}
