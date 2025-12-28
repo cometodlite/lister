@@ -396,7 +396,7 @@
 window.addEventListener('touchstart', () => {}, { passive: true });
 
 
-/* mini-player */
+/* mini-player v2 (iOS/Android) */
 (function(){
   const ua = navigator.userAgent || "";
   const htmlEl = document.documentElement;
@@ -408,6 +408,14 @@ window.addEventListener('touchstart', () => {}, { passive: true });
 
   function isMobileWidth(){
     return window.matchMedia("(max-width: 720px)").matches;
+  }
+
+  function syncPlayerHeightVar(player){
+    if (!player) return;
+    const expanded = player.classList.contains("expanded");
+    const h = expanded ? getComputedStyle(document.documentElement).getPropertyValue("--player-expanded-h").trim()
+                       : getComputedStyle(document.documentElement).getPropertyValue("--player-mini-h").trim();
+    document.documentElement.style.setProperty("--player-current-h", h || (expanded ? "186px":"118px"));
   }
 
   function initMiniPlayer(){
@@ -422,12 +430,16 @@ window.addEventListener('touchstart', () => {}, { passive: true });
     } else {
       player.classList.remove("mini","expanded");
     }
+    syncPlayerHeightVar(player);
 
-    const toggle = () => {
+    const setExpanded = (on) => {
       if (!isMobileWidth()) return;
-      const expanded = player.classList.toggle("expanded");
-      player.classList.toggle("mini", !expanded);
+      player.classList.toggle("expanded", on);
+      player.classList.toggle("mini", !on);
+      syncPlayerHeightVar(player);
     };
+
+    const toggle = () => setExpanded(!player.classList.contains("expanded"));
 
     btnExpand.addEventListener("click", (e)=>{ e.preventDefault(); toggle(); });
 
@@ -445,11 +457,7 @@ window.addEventListener('touchstart', () => {}, { passive: true });
     const vol  = player.querySelector('.volume input[type="range"]') || document.getElementById("volBar")  || document.getElementById("volbar");
     [seek, vol].forEach(el=>{
       if (!el) return;
-      el.addEventListener("pointerdown", ()=>{
-        if (!isMobileWidth()) return;
-        player.classList.add("expanded");
-        player.classList.remove("mini");
-      });
+      el.addEventListener("pointerdown", ()=> setExpanded(true));
     });
 
     // Keep correct state on resize/orientation
@@ -461,6 +469,7 @@ window.addEventListener('touchstart', () => {}, { passive: true });
       } else {
         player.classList.remove("mini","expanded");
       }
+      syncPlayerHeightVar(player);
     });
   }
 
