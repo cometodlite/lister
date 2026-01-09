@@ -14,6 +14,14 @@
   const btnFeatured = $('#btnFeatured');
   const btnFeaturedPlay = $('#btnFeaturedPlay');
 
+// SVG icon helper (Apple Music-like, no emoji)
+const ICON = {
+  play: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"></use></svg>',
+  pause: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pause"></use></svg>',
+};
+function setBtnIcon(btn, name){ if(!btn) return; btn.innerHTML = ICON[name] + '<span class="sr-only">' + (name==='play'?'재생':'일시정지') + '</span>'; btn.setAttribute('aria-label', name==='play'?'재생':'일시정지'); }
+
+
   const btnToggle = $('#btnToggle');
   const btnPrev = $('#btnPrev');
   const btnNext = $('#btnNext');
@@ -22,6 +30,21 @@
   const seekbar = $('#seekbar');
   const curTime = $('#curTime');
   const durTime = $('#durTime');
+
+  // player container (for CSS toggles)
+  const playerEl = $('#player');
+  const setSeekVisible = (visible) => {
+    if(!playerEl) return;
+    playerEl.classList.toggle('seek-hidden', !visible);
+  };
+  const updateSeekVisibility = () => {
+    const d = audio?.duration;
+    const ok = Number.isFinite(d) && d > 0;
+    setSeekVisible(ok);
+  };
+
+  // 기본은 숨김 (duration이 준비되면 노출)
+  setSeekVisible(false);
 
   const q = $('#q');
   const results = $('#results');
@@ -91,7 +114,7 @@
     setNow(track);
     audio.src = track.src;
     if (autoPlay){
-      audio.play().catch(()=>{ btnToggle.textContent = '▶'; });
+      audio.play().catch(()=>{ setBtnIcon(btnToggle,'play'); });
     }
     highlightPlaying(track);
   }
@@ -315,25 +338,36 @@
     if (seekbar){
       seekbar.addEventListener('input', () => { userSeeking = true; });
       seekbar.addEventListener('change', () => {
-        if (!audio.duration) return;
+        const d = audio?.duration;
+        if (!Number.isFinite(d) || d <= 0) return;
         const v = Number(seekbar.value) / Number(seekbar.max);
-        audio.currentTime = v * audio.duration;
+        audio.currentTime = v * d;
         userSeeking = false;
       });
     }
 
+    const syncDurationUI = () => {
+      updateSeekVisibility();
+      const d = audio?.duration;
+      if (Number.isFinite(d) && d > 0) durTime.textContent = fmt(d);
+    };
+    audio.addEventListener('loadedmetadata', syncDurationUI);
+    audio.addEventListener('durationchange', syncDurationUI);
+    audio.addEventListener('canplay', syncDurationUI);
+
     audio.addEventListener('timeupdate', () => {
       curTime.textContent = fmt(audio.currentTime);
-      if (!audio.duration) return;
-      durTime.textContent = fmt(audio.duration);
+      const d = audio?.duration;
+      if (!Number.isFinite(d) || d <= 0) return;
+      durTime.textContent = fmt(d);
       if (!userSeeking){
-        const v = (audio.currentTime / audio.duration) * Number(seekbar.max || 1000);
+        const v = (audio.currentTime / d) * Number(seekbar.max || 1000);
         seekbar.value = String(Math.floor(v));
       }
     });
 
-    audio.addEventListener('play', () => { btnToggle.textContent = '⏸'; });
-    audio.addEventListener('pause', () => { btnToggle.textContent = '▶'; });
+    audio.addEventListener('play', () => { setBtnIcon(btnToggle,'pause'); syncDurationUI(); });
+    audio.addEventListener('pause', () => { setBtnIcon(btnToggle,'play'); });
     audio.addEventListener('ended', next);
   }
 

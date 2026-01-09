@@ -382,6 +382,14 @@ code{
 .time{ color: var(--muted2); font-size: 12px; min-width: 40px; text-align:center; }
 #seekbar{ width: 100%; }
 
+/*
+  모바일(특히 인앱 브라우저)에서 오디오 메타데이터가 늦게/안 들어오면
+  seekbar가 0:00/0:00 "빈 바"처럼 보일 수 있음.
+  JS에서 duration이 유효할 때만 표시하도록 토글.
+*/
+.player.seek-hidden .seek{ display:none; }
+
+
 .player-right{ display:flex; align-items:center; gap: 10px; min-width: 170px; justify-content: flex-end; }
 #vol{ width: 110px; }
 
@@ -492,3 +500,31 @@ input[type="range"]::-moz-range-thumb{
   .player-center .controls{ order: 1; }
   .player-center .seek{ order: 2; }
 }
+
+
+
+/* --- Apple Music-like icon buttons (no emoji) --- */
+.icon-btn svg.ico,
+.pill-btn svg.ico {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: -3px;
+  color: currentColor;
+}
+.icon-btn.big svg.ico { width: 20px; height: 20px; }
+#btnPlayPause svg.ico { width: 22px; height: 22px; }
+#btnShuffle { gap: 8px; }
+#btnShuffle span { font-weight: 650; }
+
+.sr-only{
+  position:absolute!important;
+  width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+
+/* play/pause swap: set data-icon="play|pause" */
+[data-icon="play"] .ico-pause,
+[data-icon="pause"] .ico-play { display:none; }
